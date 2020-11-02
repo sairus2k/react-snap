@@ -1,6 +1,7 @@
 const crawl = require("./src/puppeteer_utils.js").crawl;
 const http = require("http");
 const express = require("express");
+const proxy = require("express-http-proxy");
 const serveStatic = require("serve-static");
 const fallback = require("express-history-api-fallback");
 const path = require("path");
@@ -16,6 +17,8 @@ const defaultOptions = {
   //# stable configurations
   port: 45678,
   source: "build",
+  proxy: undefined,
+  proxyServer: undefined,
   destination: null,
   concurrency: 4,
   include: ["/"],
@@ -661,6 +664,9 @@ const run = async (userOptions, { fs } = { fs: nativeFs }) => {
     const app = express()
       .use(options.publicPath, serveStatic(sourceDir))
       .use(fallback("200.html", { root: sourceDir }));
+    if (options.proxy) {
+      app.use(options.proxy, proxy(options.proxyServer));
+    }
     const server = http.createServer(app);
     server.listen(options.port);
     return server;
