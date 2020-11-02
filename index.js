@@ -662,7 +662,7 @@ const run = async (userOptions, { fs } = { fs: nativeFs }) => {
   );
   const startServer = options => {
     const app = express()
-      .use(options.proxy, createProxyMiddleware({target: options.proxyServer}))
+      .use(options.proxy, createProxyMiddleware({target: options.proxyServer, changeOrigin: true}))
       .use(options.publicPath, serveStatic(sourceDir))
       .use(fallback("200.html", { root: sourceDir }));
     const server = http.createServer(app);
