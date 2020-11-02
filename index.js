@@ -17,8 +17,8 @@ const defaultOptions = {
   //# stable configurations
   port: 45678,
   source: "build",
-  proxy: undefined,
-  proxyServer: undefined,
+  proxy: "/api",
+  proxyServer: "/",
   destination: null,
   concurrency: 4,
   include: ["/"],
@@ -662,11 +662,9 @@ const run = async (userOptions, { fs } = { fs: nativeFs }) => {
   );
   const startServer = options => {
     const app = express()
+      .use(options.proxy, proxy(options.proxyServer))
       .use(options.publicPath, serveStatic(sourceDir))
       .use(fallback("200.html", { root: sourceDir }));
-    if (options.proxy) {
-      app.use(options.proxy, proxy(options.proxyServer));
-    }
     const server = http.createServer(app);
     server.listen(options.port);
     return server;
